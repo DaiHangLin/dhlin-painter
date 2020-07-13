@@ -9,6 +9,7 @@
 #include <pointdata.h>
 #include <QTimer>
 #include <lineinfo.h>
+#include <QDateTime>
 
 class MyPainter : public QWidget
 {
@@ -25,8 +26,18 @@ private:
     qreal maxWidth;
     qreal minWidth;
     qreal speed;
+    qreal duration;
+    int frameCount;
+    int fps;
     QPen pen;
     QTimer *timer;
+
+    qreal getWidthImpl(qint64 pt, qint64 ct);
+    void getWidth1();
+    void getWidth2();
+    void getWidthBySegPath();
+    void paint1();
+    void paintBySegPath();
 
 protected:
     void paintEvent(QPaintEvent *event) override;

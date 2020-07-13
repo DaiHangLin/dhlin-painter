@@ -13,7 +13,7 @@ public:
     PointData(const PointData &d);
 
     QPointF p;
-    int64_t t;
+    qint64 t;
     qreal w;
 
 signals:
