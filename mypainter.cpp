@@ -93,18 +93,62 @@ void MyPainter::paint1()
     }
     path.moveTo(pointList[0].p);
     for (int i = 1; i < pointList.size(); i ++) {
-        PointData d1 = pointList[i - 1];
-        PointData d2 = pointList[i];
+        PointData &d1 = pointList[i - 1];
+        PointData &d2 = pointList[i];
         pen.setWidthF(d1.w);
         painter.setPen(pen);
-        path.quadTo(d1.p, d2.p);
-        if (d1.w - d2.w > 0.0000001) {
-            painter.strokePath(path, pen);
-            path.clear();
-            path.moveTo(d2.p);
-        } else {
-            path.lineTo(d2.p);
-        }
+//        path.quadTo(d1.p, d2.p);
+//        if (d1.w - d2.w > 0.0000001) {
+//            painter.strokePath(path, pen);
+//            path.clear();
+//            path.moveTo(d2.p);
+//        } else {
+//            path.lineTo(d2.p);
+//        }
+        painter.drawLine(d1.p, d2.p);
+    }
+
+}
+
+void MyPainter::paint2()
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    QPainterPath path;
+    pen.setWidthF(14);
+    painter.setPen(pen);
+    QPoint p0(50, 100);
+    QPoint p1(100, 50);
+    QPoint p2(300, 100);
+    path.moveTo(p0);
+    path.quadTo(p1, p2);
+    painter.drawPath(path);
+
+    painter.drawPoint(p0);
+    painter.drawPoint(p1);
+    painter.drawPoint(p2);
+
+}
+
+void MyPainter::paint3()
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    QPainterPath path;
+    if (pointList.size() <= 0) {
+        return;
+    }
+    path.moveTo(pointList[0].p);
+    for (int i = 1; i < pointList.size(); i ++) {
+        PointData &d1 = pointList[i - 1];
+        PointData &d2 = pointList[i];
+        pen.setWidthF(d1.w);
+        painter.setPen(pen);
+        path.quadTo(d1.p, (d1.p + d2.p) / 2);
+        painter.drawPath(path);
+        QPointF endPoint = path.currentPosition();
+        path &= QPainterPath();
+        path.moveTo(endPoint);
     }
 }
 
@@ -124,7 +168,8 @@ void MyPainter::paintBySegPath()
 
 void MyPainter::paintEvent(QPaintEvent *)
 {
-    paint1();
+//    paint1();
+    paint3();
 }
 
 void MyPainter::mousePressEvent(QMouseEvent *event)

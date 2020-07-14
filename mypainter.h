@@ -32,11 +32,16 @@ private:
     QPen pen;
     QTimer *timer;
 
+    QPainterPath tempPath;
+    QPainterPath allPath;
+
     qreal getWidthImpl(qint64 pt, qint64 ct);
     void getWidth1();
     void getWidth2();
     void getWidthBySegPath();
     void paint1();
+    void paint2();
+    void paint3();
     void paintBySegPath();
 
 protected:
