@@ -15,6 +15,7 @@ MyPainter::MyPainter(QWidget *parent)
     , fps(60)
     , pen(QPen(QBrush("red"), 1, Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin))
     , timer(nullptr)
+    , tempPath(QPainterPath())
 {
     timer = new QTimer();
     connect(timer, &QTimer::timeout, [=]() {
@@ -110,6 +111,46 @@ void MyPainter::paint1()
 
 }
 
+void MyPainter::addPoints(QVector<QPointF> &list, QPointF &p)
+{
+    if (list.isEmpty()) {
+        tempPath.moveTo(p);
+        list << p;
+        return;
+    }
+
+    tempPath.quadTo(lastPoint, (lastPoint + p) / 2);
+
+
+    for (qreal t = 0; t <= 1; t = t + 0.1) {
+        qDebug() << "tempPath.pointAtPercent(t)" << tempPath.pointAtPercent(t);
+        list << tempPath.pointAtPercent(t);
+    }
+    QPointF e = tempPath.currentPosition();
+    tempPath.clear();
+    tempPath.moveTo(e);
+}
+
+void MyPainter::addPoints2(QVector<QPointF> &list, QPointF &p)
+{
+    if (list.isEmpty()) {
+        list << p;
+        return;
+    }
+    QPointF bp = list.last();
+    QPointF cp = lastPoint;
+    QPointF ep = (lastPoint + p) / 2;
+    for (qreal t = 0; t < 1; t += 0.01) {
+        qreal x = (1-t) * (1-t)*bp.rx()
+            + 2 * t * (1-t) * cp.rx()
+            + t * t * ep.rx();
+        qreal y = (1-t) * (1-t)*bp.ry()
+            + 2 * t * (1-t) * cp.ry()
+            + t * t * ep.ry();
+        list << QPointF(x, y);
+    }
+}
+
 void MyPainter::paint2()
 {
     QPainter painter(this);
@@ -117,16 +158,67 @@ void MyPainter::paint2()
     QPainterPath path;
     pen.setWidthF(14);
     painter.setPen(pen);
-    QPoint p0(50, 100);
-    QPoint p1(100, 50);
-    QPoint p2(300, 100);
-    path.moveTo(p0);
-    path.quadTo(p1, p2);
-    painter.drawPath(path);
+    QPointF p0(50, 50);
+    QPointF p1(100, 100);
+    QPointF p2(50, 150);
+    QPointF p3(0, 100);
 
+    QVector<QPointF> list = QVector<QPointF>();
+
+//    list << p0 << p1 << p2 << p3;
+
+    addPoints2(list, p0);
+    lastPoint = p0;
+    addPoints2(list, p1);
+    lastPoint = p1;
+    addPoints2(list, p2);
+    lastPoint = p2;
+    addPoints2(list, p3);
+    lastPoint = p3;
+    addPoints2(list, p3);
+    qDebug() << "list last" << list.last();
+            pen.setWidthF(13);
+        pen.setColor(Qt::blue);
+        painter.setPen(pen);
+      // painter.drawPolyline(list);
+
+//    path.moveTo(p0);
+//    for(int i=1; i< list.size(); i++) {
+//        QPointF &d1 = list[i - 1];
+//        QPointF &d2 = list[i];
+
+//        pen.setWidthF(13);
+//        pen.setColor(Qt::blue);
+//        painter.setPen(pen);
+
+//        painter.drawLine(d1, d2);
+
+////        path.quadTo(d1, (d1 + d2) / 2);
+
+////        path.lineTo(d2);
+////        painter.strokePath(path, pen);
+
+////        QPointF endPoint = path.currentPosition();
+////        path.clear();
+////        path.moveTo(endPoint);
+//    }
+
+//    painter.strokePath(path, pen);
+
+    for (int i = 0; i < list.size(); i ++) {
+        QPointF &d1 = list[i];
+        pen.setWidthF(12);
+        pen.setColor(Qt::black);
+        painter.setPen(pen);
+        painter.drawPoint(d1);
+    }
+
+    pen.setColor(Qt::red);
+    painter.setPen(pen);
     painter.drawPoint(p0);
     painter.drawPoint(p1);
     painter.drawPoint(p2);
+     painter.drawPoint(p3);
 
 }
 
@@ -152,6 +244,18 @@ void MyPainter::paint3()
     }
 }
 
+void MyPainter::paint4()
+{
+    QPainter p(this);
+    QPainterPath p1(QPointF(10,10));
+    p1.quadTo(QPointF(100,50), QPointF(100,200));
+    p1.moveTo(50, 10);
+    p1.quadTo(QPointF(150,50), QPointF(150,200));
+    QPen pen(Qt::black);
+    pen.setWidth(10);
+    p.strokePath(p1, pen);
+}
+
 void MyPainter::paintBySegPath()
 {
     QPainter painter(this);
@@ -168,8 +272,8 @@ void MyPainter::paintBySegPath()
 
 void MyPainter::paintEvent(QPaintEvent *)
 {
-//    paint1();
-    paint3();
+//    paint3();
+    paint2();
 }
 
 void MyPainter::mousePressEvent(QMouseEvent *event)

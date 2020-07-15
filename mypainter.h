@@ -35,6 +35,7 @@ private:
     QPainterPath tempPath;
     QPainterPath allPath;
 
+
     qreal getWidthImpl(qint64 pt, qint64 ct);
     void getWidth1();
     void getWidth2();
@@ -42,7 +43,10 @@ private:
     void paint1();
     void paint2();
     void paint3();
+    void paint4();
     void paintBySegPath();
+    void addPoints(QVector<QPointF> &list, QPointF &p);
+    void addPoints2(QVector<QPointF> &list, QPointF &p);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
